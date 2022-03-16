@@ -19,7 +19,7 @@ class SignUp extends StatefulWidget {
   SignUpState createState() => SignUpState();
 }
 
-class SignUpState extends State<SignUp> {
+class SignUpState extends State {
   String imagePath;
   Face faceDetected;
   Size imageSize;
@@ -32,10 +32,10 @@ class SignUpState extends State<SignUp> {
   bool _saving = false;
   bool _bottomSheetVisible = false;
 
-  // service injection
-  FaceDetectorService _faceDetectorService = locator<FaceDetectorService>();
-  CameraService _cameraService = locator<CameraService>();
-  MLService _mlService = locator<MLService>();
+// service injection
+  FaceDetectorService _faceDetectorService = locator();
+  CameraService _cameraService = locator();
+  MLService _mlService = locator();
 
   @override
   void initState() {
@@ -57,7 +57,7 @@ class SignUpState extends State<SignUp> {
     _frameFaces();
   }
 
-  Future<void> onShot() async {
+  Future onShot() async {
     if (faceDetected == null) {
       showDialog(
         context: context,
@@ -72,8 +72,8 @@ class SignUpState extends State<SignUp> {
     } else {
       _saving = true;
       await Future.delayed(Duration(milliseconds: 500));
-      await _cameraService.cameraController.stopImageStream();
-      await Future.delayed(Duration(milliseconds: 200));
+      //await _cameraService.cameraController.stopImageStream();
+      //await Future.delayed(Duration(milliseconds: 200));
       XFile file = await _cameraService.takePicture();
       imagePath = file.path;
 
@@ -99,6 +99,9 @@ class SignUpState extends State<SignUp> {
           await _faceDetectorService.detectFacesFromImage(image);
 
           if (_faceDetectorService.faces.isNotEmpty) {
+            setState(() {
+              faceDetected = _faceDetectorService.faces[0];
+            });
             if (_saving) {
               _mlService.setCurrentPrediction(image, faceDetected);
               setState(() {
@@ -171,14 +174,14 @@ class SignUpState extends State<SignUp> {
               child: Container(
                 width: width,
                 height:
-                    width * _cameraService.cameraController.value.aspectRatio,
+                width * _cameraService.cameraController.value.aspectRatio,
                 child: Stack(
                   fit: StackFit.expand,
                   children: <Widget>[
                     CameraPreview(_cameraService.cameraController),
                     CustomPaint(
                       painter:
-                          FacePainter(face: faceDetected, imageSize: imageSize),
+                      FacePainter(face: faceDetected, imageSize: imageSize),
                     ),
                   ],
                 ),
@@ -202,10 +205,10 @@ class SignUpState extends State<SignUp> {
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: !_bottomSheetVisible
             ? AuthActionButton(
-                onPressed: onShot,
-                isLogin: false,
-                reload: _reload,
-              )
+          onPressed: onShot,
+          isLogin: false,
+          reload: _reload,
+        )
             : Container());
   }
 }

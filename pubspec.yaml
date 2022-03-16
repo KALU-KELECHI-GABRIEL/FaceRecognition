@@ -20,6 +20,7 @@ version: 1.0.0+1
 environment:
   sdk: ">=2.7.0 <3.0.0"
 
+
 dependencies:
   flutter:
     sdk: flutter
@@ -29,7 +30,11 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   tflite_flutter: ^0.8.0
-  camera: ^0.8.1
+  camera:
+    git:
+      url: https://github.com/flutter/plugins
+      path: packages/camera/camera
+      ref: 9e46048ad2e1f085c1e8f6c77391fa52025e681f
   path_provider: ^2.0.1
   path: ^1.8.0
   google_ml_kit: ^0.5.0
